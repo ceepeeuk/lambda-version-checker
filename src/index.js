@@ -1,4 +1,6 @@
 const AWS = require('aws-sdk');
+const Table = require('cli-table');
+
 AWS.config.update({ region: 'eu-west-2'});
 
 async function  getVersion(lambda, functions) {
@@ -32,9 +34,27 @@ async function run() {
         getFunctions('test'),
         getFunctions('prod'),
     ]);
-    dev.map(x => console.log({ env: 'dev', name: x.shortName, version: x.version}));
-    test.map(x => console.log({ env: 'test', name: x.shortName, version: x.version}));
-    prod.map(x => console.log({ env: 'prod', name: x.shortName, version: x.version}));
+
+    const table = new Table({
+        head: ['name', 'dev', 'test', 'prod']
+        , colWidths: [80, 20, 20, 20]
+    });
+
+    dev.sort((a, b) => (a.shortName > b.shortName) ? 1 : -1);
+    dev.forEach(d => {
+        table.push([
+            d.shortName,
+            d.version,
+            test.find(x => d.shortName === x.shortName) !== undefined
+              ? test.find(x => d.shortName === x.shortName).version
+              : 'unreleased',
+            prod.find(x => d.shortName === x.shortName) !== undefined
+              ? prod.find(x => d.shortName === x.shortName).version
+              : 'unreleased',
+        ]);
+    });
+
+    console.log(table.toString());
 }
 
 run().then(() => console.log('\ndone'));

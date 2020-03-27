@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ceepeeuk/lambda-version-checker#readme",
   "dependencies": {
-    "aws-sdk": "^2.647.0"
+    "aws-sdk": "^2.647.0",
+    "cli-table": "^0.3.1"
   }
 }
